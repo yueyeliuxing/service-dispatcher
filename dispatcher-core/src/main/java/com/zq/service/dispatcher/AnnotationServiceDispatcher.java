@@ -1,6 +1,7 @@
 package com.zq.service.dispatcher;
 
-import com.zq.service.dispatcher.context.AnnotationServiceContext;
+import com.zq.service.dispatcher.context.CoreServiceContext;
+import com.zq.service.dispatcher.context.IocDefinitionContext;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -14,6 +15,6 @@ import org.springframework.context.ApplicationContextAware;
 public class AnnotationServiceDispatcher extends AbstractServiceDispatcher implements ServiceDispatcher, ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        serviceContext = new AnnotationServiceContext(applicationContext);
+        serviceContext = new CoreServiceContext(new IocDefinitionContext(applicationContext));
     }
 }

@@ -1,9 +1,8 @@
 package com.zq.service.dispatcher.service;
 
-import com.zq.service.dispatcher.interceptor.AtomInterceptor;
-import com.zq.service.dispatcher.interceptor.AtomInterceptorContext;
+import com.zq.service.dispatcher.service.interceptor.AtomInterceptor;
+import com.zq.service.dispatcher.service.interceptor.AtomInterceptorContext;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -58,10 +57,6 @@ public class InterceptAtomService extends AbstractAtomService implements AtomSer
     @Override
     public Object dispatch() {
         if (interceptors != null && !interceptors.isEmpty()) {
-            if(!started){
-                started = true;
-                interceptors =  interceptors.stream().sorted(Comparator.comparing(AtomInterceptor::priority).reversed()).collect(Collectors.toList());
-            }
             if(currentIndex.get().get() < interceptors.size()){
                 AtomInterceptor interceptor = interceptors.get(currentIndex.get().getAndIncrement());
                 Object obj = interceptor.intercept(this);

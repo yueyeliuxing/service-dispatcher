@@ -1,5 +1,7 @@
 package com.zq.service.dispatcher.service;
 
+import com.zq.service.dispatcher.pools.DefaultThreadPool;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Executor;
 
@@ -15,9 +17,9 @@ public class AsyncAtomService extends AbstractAtomService implements AtomService
 
     private Executor executor;
 
-    public AsyncAtomService(AtomService atomService, Executor executor) {
+    public AsyncAtomService(AtomService atomService) {
         this.atomService = atomService;
-        this.executor = executor;
+        this.executor = new DefaultThreadPool();
     }
 
     @Override

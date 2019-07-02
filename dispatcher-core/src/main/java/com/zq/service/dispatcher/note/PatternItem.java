@@ -1,7 +1,7 @@
 package com.zq.service.dispatcher.note;
 
 import com.zq.service.dispatcher.convertor.DefaultTypeConvertor;
-import com.zq.service.dispatcher.interceptor.ArrangePriority;
+import com.zq.service.dispatcher.service.interceptor.ArrangePriority;
 
 import java.lang.annotation.*;
 

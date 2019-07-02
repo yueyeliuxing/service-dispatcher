@@ -1,6 +1,4 @@
-package com.zq.service.dispatcher.interceptor;
-
-import java.lang.reflect.InvocationTargetException;
+package com.zq.service.dispatcher.service.interceptor;
 
 /**
  * @program: service-dispatcher
@@ -9,12 +7,6 @@ import java.lang.reflect.InvocationTargetException;
  * @create: 2018-06-28 11:36
  **/
 public interface AtomInterceptor {
-
-    /**
-     * 优先级
-     * @return
-     */
-    byte priority();
 
     /**
      * 拦截方法

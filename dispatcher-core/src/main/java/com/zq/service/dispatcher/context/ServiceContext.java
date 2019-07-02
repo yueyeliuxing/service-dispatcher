@@ -13,17 +13,6 @@ public interface ServiceContext {
 
     /**
      *
-     *   服务注册
-     * @author zhouqi
-     * @date 2018/6/28 10:12
-     * @param serviceKey
-     * @param service
-     * @return
-     */
-    void register(ServiceKey serviceKey, AtomService service);
-
-    /**
-     *
      *   获取服务
      * @author zhouqi
      * @date 2018/6/28 13:09

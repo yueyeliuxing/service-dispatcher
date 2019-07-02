@@ -1,4 +1,4 @@
-package com.zq.service.dispatcher.interceptor;
+package com.zq.service.dispatcher.service.interceptor;
 
 /**
  * @program: service-dispatcher

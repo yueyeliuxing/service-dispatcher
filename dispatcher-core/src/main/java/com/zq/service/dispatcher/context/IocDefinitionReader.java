@@ -1,26 +1,12 @@
 package com.zq.service.dispatcher.context;
 
+
 import com.zq.service.dispatcher.config.ServiceKey;
-import com.zq.service.dispatcher.convertor.TypeConvertor;
-import com.zq.service.dispatcher.interceptor.AroundAtomInterceptor;
-import com.zq.service.dispatcher.interceptor.AtomInterceptor;
 import com.zq.service.dispatcher.note.*;
-import com.zq.service.dispatcher.pools.DefaultThreadPool;
-import com.zq.service.dispatcher.reflect.ClassUtils;
-import com.zq.service.dispatcher.service.AsyncAtomService;
-import com.zq.service.dispatcher.service.AtomService;
-import com.zq.service.dispatcher.service.CoreAtomService;
-import com.zq.service.dispatcher.service.InterceptAtomService;
-import com.zq.service.dispatcher.convertor.ConvertorWapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.common.TemplateParserContext;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -29,26 +15,22 @@ import java.util.regex.Pattern;
 
 /**
  * @program: service-dispatcher
- * @description: 基于注解服务上下文
+ * @description: 注解 读取器
  * @author: zhouqi1
- * @create: 2018-06-28 10:14
+ * @create: 2019-07-02 19:29
  **/
-public class AnnotationServiceContext extends AbstractServiceContext implements ServiceContext {
+public class IocDefinitionReader implements DefinitionReader<ApplicationContext> {
 
-    private Logger logger = LoggerFactory.getLogger(AnnotationServiceContext.class);
+    private Logger logger = LoggerFactory.getLogger(IocDefinitionReader.class);
 
-    private ApplicationContext applicationContext;
+    private DefinitionContext definitionContext;
 
-    public AnnotationServiceContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-        loadServices();
+    public IocDefinitionReader(DefinitionContext definitionContext) {
+        this.definitionContext = definitionContext;
     }
 
-    public ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
-    public void loadServices(){
+    @Override
+    public void loadDefinitions(ApplicationContext applicationContext) {
         Environment environment = applicationContext.getEnvironment();
 
         Map<String, Object> handlerMap =  applicationContext.getBeansWithAnnotation(ServiceDispatcher.class);
@@ -83,17 +65,8 @@ public class AnnotationServiceContext extends AbstractServiceContext implements 
                                         .group(group).name(name).version(version).build().toServiceKey();
 
                                 Class typeConvertorClazz = patternItem.convertor();
-                                TypeConvertor typeConvertor =  null;
-                                if(typeConvertorClazz != null) {
-                                    typeConvertor =  (TypeConvertor) ClassUtils.newBean(typeConvertorClazz);
-                                }
-                                AtomService atomService = new CoreAtomService(handler, method, typeConvertor);
-                                if(patternItem.async()){
-                                    atomService = new AsyncAtomService(atomService, new DefaultThreadPool());
-                                }
-                                logger.info("加载key->{}服务", dispatcherKey);
-                                serviceStorage.register(dispatcherKey, atomService);
-
+                                logger.info("加载key->{}服务:{}", dispatcherKey,  handler.getClass().getName()+method.getName());
+                                definitionContext.addServiceDefinition(dispatcherKey, new ServiceDefinition(dispatcherKey, typeConvertorClazz, patternItem.async(), handler, method));
                             }
                         }
                     }
@@ -104,8 +77,8 @@ public class AnnotationServiceContext extends AbstractServiceContext implements 
         Map<String, Object> interceptorMap =  applicationContext.getBeansWithAnnotation(ServiceInterceptor.class);
         if(interceptorMap != null && !interceptorMap.isEmpty()){
             for(String beanName : interceptorMap.keySet()){
-                Object consumer = interceptorMap.get(beanName);
-                Class<?> clazz = consumer.getClass();
+                Object interceptor = interceptorMap.get(beanName);
+                Class<?> clazz = interceptor.getClass();
                 Method[] methods = clazz.getDeclaredMethods();
                 if(methods != null && methods.length > 0){
                     for(Method method : methods){
@@ -132,38 +105,9 @@ public class AnnotationServiceContext extends AbstractServiceContext implements 
                                 String dispatcherKey = ServiceKey.newBuilder()
                                         .group(group).name(name).version(version).build().toServiceKey();
                                 byte priority = patternItem.priority();
-                                if(!serviceStorage.contains(dispatcherKey)){
-                                    continue;
-                                }
-
                                 Class typeConvertorClazz = patternItem.convertor();
-                                TypeConvertor typeConvertor = null;
-                                if(typeConvertorClazz != null){
-                                    typeConvertor = (TypeConvertor) ClassUtils.newBean(typeConvertorClazz);
-                                }
-                                AtomInterceptor atomInterceptor = new AroundAtomInterceptor(consumer, method, typeConvertor, priority);
-                                AtomService atomService = serviceStorage.find(dispatcherKey);
-                                InterceptAtomService interceptAtomService = null;
-                                if(atomService instanceof CoreAtomService) {
-                                    interceptAtomService = new InterceptAtomService(atomService);
-                                    interceptAtomService.addInterceptor(atomInterceptor);
-                                    serviceStorage.register(dispatcherKey, interceptAtomService);
-                                }else if(atomService instanceof InterceptAtomService) {
-                                    interceptAtomService = (InterceptAtomService)atomService;
-                                    interceptAtomService.addInterceptor(atomInterceptor);
-                                    serviceStorage.register(dispatcherKey, interceptAtomService);
-                                }else if(atomService instanceof AsyncAtomService){
-                                    AsyncAtomService asyncAtomService = (AsyncAtomService)atomService;
-                                    AtomService targetService = asyncAtomService.getAtomService();
-                                    if(targetService instanceof CoreAtomService) {
-                                        interceptAtomService = new InterceptAtomService(targetService);
-                                    }else if(targetService instanceof InterceptAtomService) {
-                                        interceptAtomService = (InterceptAtomService)targetService;
-                                    }
-                                    interceptAtomService.addInterceptor(atomInterceptor);
-                                    asyncAtomService.setAtomService(interceptAtomService);
-                                    serviceStorage.register(dispatcherKey, asyncAtomService);
-                                }
+                                logger.info("加载key->{}拦截器：{}", dispatcherKey, interceptor.getClass().getName()+method.getName());
+                                definitionContext.addInterceptorDefinition(dispatcherKey, new InterceptorDefinition(dispatcherKey, priority, typeConvertorClazz, interceptor, method));
                             }
                         }
                     }

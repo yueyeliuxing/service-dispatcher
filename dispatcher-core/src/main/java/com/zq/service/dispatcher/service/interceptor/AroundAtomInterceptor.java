@@ -1,6 +1,5 @@
-package com.zq.service.dispatcher.interceptor;
+package com.zq.service.dispatcher.service.interceptor;
 
-import com.zq.service.dispatcher.convertor.ConvertorWapper;
 import com.zq.service.dispatcher.convertor.TypeConvertor;
 import com.zq.service.dispatcher.exception.ServiceBusinessException;
 import com.zq.service.dispatcher.exception.ServiceReflectException;
@@ -26,22 +25,10 @@ public class AroundAtomInterceptor implements AtomInterceptor {
 
     private TypeConvertor typeConvertor;
 
-    private byte priority;
-
     public AroundAtomInterceptor(Object target, Method method, TypeConvertor typeConvertor) {
         this.target = target;
         this.method = method;
         this.typeConvertor = typeConvertor;
-    }
-
-    public AroundAtomInterceptor(Object target, Method method, TypeConvertor typeConvertor, byte priority) {
-        this(target, method, typeConvertor);
-        this.priority = priority;
-    }
-
-    @Override
-    public byte priority() {
-        return priority;
     }
 
     @Override

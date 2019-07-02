@@ -1,7 +1,7 @@
 package com.zq.service.dispatcher.simple.handler.interceptors;
 
 
-import com.zq.service.dispatcher.interceptor.AtomInterceptorContext;
+import com.zq.service.dispatcher.service.interceptor.AtomInterceptorContext;
 import com.zq.service.dispatcher.note.AroundInterceptor;
 import com.zq.service.dispatcher.note.PatternItem;
 import com.zq.service.dispatcher.note.ServiceInterceptor;
