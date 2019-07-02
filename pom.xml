@@ -25,7 +25,7 @@
     
 	<modules>
 		<module>dispatcher-core</module>
-		<module>dispatcher-canal-starter</module>
+		<module>dispatcher-spring-boot-starter</module>
 		<module>dispatcher-example</module>
 	</modules>
 
