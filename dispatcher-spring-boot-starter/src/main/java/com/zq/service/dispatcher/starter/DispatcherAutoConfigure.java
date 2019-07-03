@@ -21,7 +21,7 @@ public class DispatcherAutoConfigure {
 
     @Bean
     @ConditionalOnMissingBean
-    ServiceDispatcher serviceDispatcher (){
-        return  new AnnotationServiceDispatcher();
+    ServiceDispatcherFactoryBean serviceDispatcher (){
+        return  new ServiceDispatcherFactoryBean();
     }
 }

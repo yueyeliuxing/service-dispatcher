@@ -12,9 +12,9 @@ import org.springframework.context.ApplicationContextAware;
  * @author: zhouqi1
  * @create: 2018-05-30 12:39
  **/
-public class AnnotationServiceDispatcher extends AbstractServiceDispatcher implements ServiceDispatcher, ApplicationContextAware {
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        serviceContext = new CoreServiceContext(new IocDefinitionContext(applicationContext));
+public class AnnotationServiceDispatcher extends AbstractServiceDispatcher implements ServiceDispatcher {
+
+    public AnnotationServiceDispatcher(ApplicationContext applicationContext) {
+        super(new IocDefinitionContext(applicationContext));
     }
 }

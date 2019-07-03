@@ -2,6 +2,9 @@ package com.zq.service.dispatcher;
 
 import com.zq.service.dispatcher.config.ServiceConfig;
 import com.zq.service.dispatcher.config.ServiceKey;
+import com.zq.service.dispatcher.context.CoreServiceContext;
+import com.zq.service.dispatcher.context.DefinitionContext;
+import com.zq.service.dispatcher.context.IocDefinitionContext;
 import com.zq.service.dispatcher.context.ServiceContext;
 import com.zq.service.dispatcher.exception.ServiceNotFindException;
 import com.zq.service.dispatcher.service.AtomService;
@@ -17,6 +20,10 @@ import java.lang.reflect.InvocationTargetException;
 public abstract class AbstractServiceDispatcher implements ServiceDispatcher {
 
     protected ServiceContext serviceContext;
+
+    public AbstractServiceDispatcher(DefinitionContext definitionContext) {
+        this.serviceContext = new CoreServiceContext(definitionContext);
+    }
 
     @Override
     public Object dispatcher(ServiceConfig serviceConfig) {
